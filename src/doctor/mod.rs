@@ -1288,6 +1288,8 @@ mod tests {
                 agentic_timeout_secs: None,
                 skills_directory: None,
                 memory_namespace: None,
+                max_context_tokens: None,
+                max_tool_result_chars: None,
             },
         );
         config.agents.insert(
@@ -1306,6 +1308,8 @@ mod tests {
                 agentic_timeout_secs: None,
                 skills_directory: None,
                 memory_namespace: None,
+                max_context_tokens: None,
+                max_tool_result_chars: None,
             },
         );
 
