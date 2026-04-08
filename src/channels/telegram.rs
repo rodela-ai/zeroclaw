@@ -1309,6 +1309,7 @@ Allowlist Telegram username (without '@') or numeric user ID.",
             thread_ts: thread_id,
             interruption_scope_id: None,
             attachments: vec![],
+            is_dm: !Self::is_group_message(message),
         })
     }
 
@@ -1440,6 +1441,7 @@ Allowlist Telegram username (without '@') or numeric user ID.",
             thread_ts: thread_id,
             interruption_scope_id: None,
             attachments: vec![],
+            is_dm: !Self::is_group_message(message),
         })
     }
 
@@ -1645,6 +1647,7 @@ Allowlist Telegram username (without '@') or numeric user ID.",
             thread_ts: thread_id,
             interruption_scope_id: None,
             attachments: vec![],
+            is_dm: !is_group,
         })
     }
 

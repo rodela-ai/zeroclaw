@@ -6511,6 +6511,22 @@ pub struct ChannelsConfig {
     /// as a single concatenated message. `0` disables debouncing. Default: `0`.
     #[serde(default)]
     pub debounce_ms: u64,
+    /// Run an LLM reply-intent precheck before responding in group conversations.
+    /// When `true`, the agent makes a lightweight classification call to decide
+    /// whether the latest group message warrants a reply (`REPLY` / `NO_REPLY`).
+    /// When `false`, group messages are handled based solely on `mention_only`:
+    /// if `mention_only` is enabled, only @-mentions get a reply; otherwise the
+    /// agent replies to every message.
+    /// Direct messages always get a reply regardless of this setting.
+    /// Default: `false`.
+    #[serde(default)]
+    pub reply_precheck: bool,
+    /// Maximum concurrent LLM requests per channel. Controls how many messages
+    /// can be processed simultaneously. Lower values prevent saturating
+    /// backends with limited slots (e.g. llama.cpp `--parallel 3`).
+    /// Default: `4`.
+    #[serde(default = "default_max_concurrent_per_channel")]
+    pub max_concurrent_per_channel: usize,
 }
 
 impl ChannelsConfig {
@@ -6665,6 +6681,10 @@ fn default_channel_message_timeout_secs() -> u64 {
     300
 }
 
+fn default_max_concurrent_per_channel() -> usize {
+    4
+}
+
 fn default_session_backend() -> String {
     "sqlite".into()
 }
@@ -6712,6 +6732,8 @@ impl Default for ChannelsConfig {
             session_backend: default_session_backend(),
             session_ttl_hours: 0,
             debounce_ms: 0,
+            reply_precheck: false,
+            max_concurrent_per_channel: default_max_concurrent_per_channel(),
         }
     }
 }
@@ -11385,6 +11407,8 @@ auto_save = true
                 session_backend: default_session_backend(),
                 session_ttl_hours: 0,
                 debounce_ms: 0,
+                reply_precheck: false,
+                max_concurrent_per_channel: default_max_concurrent_per_channel(),
             },
             memory: MemoryConfig::default(),
             storage: StorageConfig::default(),
@@ -12438,6 +12462,8 @@ allowed_users = ["@ops:matrix.org"]
             session_backend: default_session_backend(),
             session_ttl_hours: 0,
             debounce_ms: 0,
+            reply_precheck: false,
+            max_concurrent_per_channel: 4,
         };
         let toml_str = toml::to_string_pretty(&c).unwrap();
         let parsed: ChannelsConfig = toml::from_str(&toml_str).unwrap();
@@ -12818,6 +12844,8 @@ channel_ids = ["C123", "D456"]
             session_backend: default_session_backend(),
             session_ttl_hours: 0,
             debounce_ms: 0,
+            reply_precheck: false,
+            max_concurrent_per_channel: 4,
         };
         let toml_str = toml::to_string_pretty(&c).unwrap();
         let parsed: ChannelsConfig = toml::from_str(&toml_str).unwrap();
